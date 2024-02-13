@@ -2,6 +2,8 @@ import GameService from "../services/GameService.js";
 import Hero from "../Classes/Hero.js";
 import Villain from "../Classes/Villain.js";
 import Dice from "../Classes/Dices.js"
+import Erudite from "../Classes/Erudite.js";
+
 
 // GAME START
 const StartNormalGame = async () => {
@@ -14,7 +16,10 @@ const StartNormalGame = async () => {
 	const hero = new Hero(getHero(allSuperPeople));
 	const villain = new Villain(getVillain(allSuperPeople))
 
-	startCombat(hero, villain)
+	// Crear una instancia de la clase Erudito
+	const erudite = new Erudite();
+
+	startCombat(hero, villain, erudite)
 
 
   } catch (error) {
@@ -81,6 +86,7 @@ const figth = (hero, villain) => {
 	// Variable que para la batalla
 	let stopFigth = false
 	let turn = "none"
+	let turnCounter = 0;
 
 	// Inicializamos los objetos de dados
 	const d100 = new Dice(100);
@@ -88,25 +94,43 @@ const figth = (hero, villain) => {
 	turn = startTurnSelection(turn, hero, villain)
 
 	while( !stopFigth ){
-	
+
 		// Turno del heroe
 		if(turn === "hero"){
 
-			// El heroe hace sus cosas
 			Phase1(d100, hero, villain);
 
-			// Cambio de turno
 			console.log("Cambio de turno al villano");
 			turn = "villain"
 
+			if (turnCounter >= 5){
+				turnCounter = 0;
+			}
 
-		} if (turn === "villain"){
+		} 
+		
+		// Turno del Villano
+		if (turn === "villain"){
 
-			// El villano hace sus cosas
 			Phase1(d100, villain, hero);
 
-			// cambio de turno
 			console.log("Cambio de turno al heroe");
+			turn = "hero"
+
+			if (turnCounter >= 5){
+				turnCounter = 0;
+			}
+
+		} 
+		
+		
+		if (turn === "erudite") {
+			// El erudito se muestra
+			console.log("******************************")
+			console.log("El erudito se muestra asombrado por los dos guerreros, pero se mofa de ellos")
+			console.log("******************************")
+
+			turnCounter = 0;
 			turn = "hero"
 		}
 
@@ -120,8 +144,16 @@ const figth = (hero, villain) => {
 			}
 			
 			stopFigth = true
-	
+			turnCounter = 0;
 		}
+
+		// Verificar si el turno actual está entre 3 y 5 (inclusive) de manera aleatoria y con una aleatoriedad entre las mismos
+		if (turnCounter >= 3 && turnCounter <= 5 && Math.random() > 0.5) {
+			turn = "erudite"
+			turnCounter = 0;
+		}
+
+		turnCounter++
 	}
 }
 
