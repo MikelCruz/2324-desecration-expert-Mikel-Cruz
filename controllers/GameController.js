@@ -173,16 +173,7 @@ const figth = (hero, villain, erudite) => {
 			
 	
 		// Para la batalla
-		if(hero.hitPoints <= 0 || villain.hitPoints <= 0){
-			if (hero.hitPoints <=0 ) {
-				console.log("EL HEROE " + hero.name + " A PERECIDO")
-			} if( villain.hitPoints <= 0){
-				console.log("EL VILLANO " + villain.name + " A PERECIDO")
-			}
-			
-			stopFigth = true
-			turnCounter = 0;
-		}
+		stopFigth = checkIfBattleEnded(hero, villain)
 
 		turnCounter++
 	}
@@ -403,6 +394,19 @@ const armChecker = (fighter) => {
 	if(!fighter.hasLeftArm && !fighter.hasRightArm ){
 		fighter.strength = fighter.strength / 4
 	}
+}
+
+const checkIfBattleEnded = (hero, villain, stopFigth) => {
+	if(hero.hitPoints <= 0 || villain.hitPoints <= 0){
+		if (hero.hitPoints <=0 ) {
+			console.log("EL HEROE " + hero.name + " A PERECIDO")
+		} if( villain.hitPoints <= 0){
+			console.log("EL VILLANO " + villain.name + " A PERECIDO")
+		}
+		return stopFigth = true
+	}
+
+	else return stopFigth = false
 }
 
 
