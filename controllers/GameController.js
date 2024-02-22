@@ -365,11 +365,24 @@ const DiceD20PhaseWG = (resultadoD20, fighter, target, erudite) => {
 		erudite.HPW = 0
 	}
 
-	console.log("El atacante " + fighter.name + " se siente mareado, El erudito aprovechando este desliz recupera sus gafas")
-	erudite.glassesOn = true
-	
-	target.glassesOn 	= false
+
+	// Las gafas se las quitaran aun estando el Erudito muerto ya que se sentiran mareados de todas formas
+	console.log("El atacante " + fighter.name + " se siente mareado y se quita las gafas,")
+
 	fighter.glassesOn = false
+	target.glassesOn 	= false
+
+	if(erudite.HPW > 0){
+		console.log("El erudito aprovechando este desliz recupera sus gafas")
+		erudite.glassesOn = true
+	} else if( erudite.HPW < 0) {
+		console.log("EL ERUDITO A PERECIDO NO APARECERA MÁS");
+		console.log("Los guerreros asombrados por la muerte del erudito corren para recoger las gafas")
+		console.log("pero estas desaparecen desintegrandose al igual que el cuerpo del erudito, como si de arte de magia se tratase.")
+	}
+	
+	
+
 }
 
 const angerSelection = (erudite) => {
