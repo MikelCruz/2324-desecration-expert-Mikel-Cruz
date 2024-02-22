@@ -85,7 +85,7 @@ const figth = (hero, villain, erudite) => {
 	let stopFigth = false
 	let turn = "none"
 	let turnCounter = 0;
-	let turnNumber = 0;
+	let turnNumber = 1;
 
 	// Inicializamos los objetos de dados
 	const d100 = new Dice(100);
@@ -94,17 +94,17 @@ const figth = (hero, villain, erudite) => {
 
 	while( !stopFigth ){
 
-		turnNumber++;
-		console.log("Turno: " + turnNumber)
-
 		// Turno del heroe
 		if(turn === "hero"){
 
 			Phase1(d100, hero, villain, erudite);
-			
+
 			console.log("Cambio de turno al villano");
 			turn = "villain"
+			turnNumber++;
+			console.log("Turno: " + turnNumber)
 		} 
+
 		
 		// Turno del Villano
 		if (turn === "villain"){
@@ -113,6 +113,8 @@ const figth = (hero, villain, erudite) => {
 
 			console.log("Cambio de turno al heroe");
 			turn = "hero"
+			turnNumber++;
+			console.log("Turno: " + turnNumber)
 
 		} 
 		
@@ -139,6 +141,15 @@ const figth = (hero, villain, erudite) => {
 				console.log("El " + turn + " Ha recogido las gafas del erudito!")
 			}
 
+			if (erudite.glassesOn) {
+				console.log("El erudito tiene las gafas, por lo que desaparecerá de la ronda")
+
+				// Cambio de turno
+				const randomNumber = Math.random();
+				randomNumber < 0.5 ? hero.glassesOn = true : villain.glassesOn = true;
+				turn = randomNumber < 0.5 ? "hero" : "villain";
+			}
+
 			console.log("******************************")
 
 			// Reinicia la aparicion de turno del Erudito
@@ -146,6 +157,19 @@ const figth = (hero, villain, erudite) => {
 		}
 
 
+		
+
+		// Verificar si el turno actual está entre 3 y 5 (inclusive) de manera aleatoria y con una aleatoriedad entre las mismos
+		if(erudite.HPW > 0){
+			if (turnCounter >= 3 && turnCounter <= 5 && Math.random() > 0.5) {
+				turn = "erudite"
+				turnCounter = 0;
+			}
+		} else {
+			console.log("El erudito a perecido y no aparecera esta ronda ")
+		}
+			
+	
 		// Para la batalla
 		if(hero.hitPoints <= 0 || villain.hitPoints <= 0){
 			if (hero.hitPoints <=0 ) {
@@ -155,12 +179,6 @@ const figth = (hero, villain, erudite) => {
 			}
 			
 			stopFigth = true
-			turnCounter = 0;
-		}
-
-		// Verificar si el turno actual está entre 3 y 5 (inclusive) de manera aleatoria y con una aleatoriedad entre las mismos
-		if (turnCounter >= 3 && turnCounter <= 5 && Math.random() > 0.5) {
-			turn = "erudite"
 			turnCounter = 0;
 		}
 
@@ -271,19 +289,75 @@ const DiceD20Phase = (resultadoD20, fighter, target) => {
 };
 
 const DiceD20PhaseWG = (resultadoD20, fighter, target, erudite) => {
-	
+	const d20 	= new Dice(20);
+	const newResultD20 	= d20.rollD20();
+
+	const d10 	= new Dice(10);
+	const resultD10 	= d10.rollD10();
+
+
 	let damage = 0;
 
-	// Pifia
+	// Pifia 1 - 3 - DONE
 	if (resultadoD20 >= 1 && resultadoD20 <= 3) {
-		damage = Math.ceil(resultadoD20);
+		damage = Math.ceil(newResultD20);
 		fighter.hitPoints -= damage;
 		fighter.strength = fighter.strength/2 
-
-		console.log("PIFIA! El atacante envuelto en rabia por las gafas del erudito lanza un ataque tan endeble que falla y se hiere a si mismo");
-
-		}
+		// console.log("PIFIA! El atacante envuelto en rabia por las gafas del erudito lanza un ataque tan endeble que falla y se hiere a si mismo");
+		console.log("Pifia. El atacante se lesionará el brazo izquierdo, quedando su atributo STR dañado")
 		console.log("El ataque de " + fighter.name + " es desastroso y se ejerce un daño de: " + damage + " puntos")
+	}
+
+	// Pifia 4 - 6 - DONE
+	if (resultadoD20 >= 4 && resultadoD20 <= 6) {
+		damage = Math.ceil(newResultD20);
+		fighter.hitPoints -= damage;
+		fighter.strength = fighter.strength/2 
+		console.log("Pifia. El atacante se lesionará el brazo derecho, quedando su atributo STR dañado")
+		console.log("El ataque de " + fighter.name + " es desastroso y se ejerce un daño de: " + damage + " puntos")
+	}
+
+	// Caos 7 - 9 - DONE
+	if (resultadoD20 >= 7 && resultadoD20 <= 9) { console.log("Caos. El atacante pierde la memoria y no ataca") }
+
+	// Aullido 10 - 13 - DONE
+	if (resultadoD20 >= 10 && resultadoD20 <= 13) {
+		damage = Math.ceil(resultD10);
+		erudite.HPW -= damage
+		console.log("Aullido. El Erudito grita: *tú eres tonto* y " + fighter.name + " descubrirá dónde se encuentra, momento que aprovechará para atacarle.")
+		console.log("El ataque de " + fighter.name + " es exitoso y ejerce un daño de: " + damage + " puntos al Erudito")
+		console.log("Erudite STATS");
+		showStats(erudite)
+	}
+
+	// Granuja 14 - 16 - DONE
+	if (resultadoD20 >= 14 && resultadoD20 <= 16) {
+		console.log("el atacante aprovechara el despiste del enemigo para colocarle las gafas ");
+		// El atacante le coloca las gafas a su enemigo
+		fighter.glassesOn = false
+		target.glassesOn = true 
+	}
+
+	// Perspicaz 17 - 18 - DONE
+	if (resultadoD20 >= 17 && resultadoD20 <= 18) {
+		console.log("El erudito detecta al atacante y le atrea con su famoso grito * tu eres tonto *, momento en el que aprovecha para recuperar sus gafas")
+		console.log("Sin embargo, al furia caótica del atacante se desata y embiste a El Erudito");
+		console.log("El erudito recibiría un daño de " + resultD10 + " puntos, pero el erudito nunca sufrio daño alguno, debido a sus gafas protectoras")
+		erudite.glassesOn = true 
+	}
+	
+	// Endemonido 19 - 20 - DONE
+	if (resultadoD20 >= 19 && resultadoD20 <= 20) {
+		console.log("El atacante desata todo el caos de El Erudito, persiguiendole y cortandole la baveza")
+		console.log("El erudito a perecido");
+		erudite.HPW = 0
+	}
+
+	console.log("El atacante " + fighter.name + " se siente mareado, El erudito aprovechando este desliz recupera sus gafas")
+	erudite.glassesOn = true
+	
+	target.glassesOn 	= false
+	fighter.glassesOn = false
 }
 
 const angerSelection = (erudite) => {
