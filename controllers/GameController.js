@@ -15,8 +15,6 @@ const StartNormalGame = async () => {
 
 	const hero = new Hero(getHero(allSuperPeople));
 	const villain = new Villain(getVillain(allSuperPeople))
-
-	// Crear una instancia de la clase Erudito
 	const erudite = new Erudite();
 
 	startCombat(hero, villain, erudite)
@@ -52,13 +50,13 @@ const randomSuperHeroesNumber = (allSuperPeople) => { return Math.floor(Math.ran
 // 			COMBAT
 // ============================
 
-const startCombat = (hero, villain) => {
+const startCombat = (hero, villain, erudite) => {
 
 	console.log("THE BATTLE BETWEEN " + hero.name + " & " + villain.name + " BEGGINS!")
 	
 	whoStarts(hero, villain)
 
-	figth(hero, villain);
+	figth(hero, villain, erudite);
 
 } 
 
@@ -80,13 +78,14 @@ const whoStarts = (hero, villain) => {
 	return whoStarts;
 }
 
-const figth = (hero, villain) => {
+const figth = (hero, villain, erudite) => {
 
 	console.log("===========================================")
 	// Variable que para la batalla
 	let stopFigth = false
 	let turn = "none"
 	let turnCounter = 0;
+	let turnNumber = 0;
 
 	// Inicializamos los objetos de dados
 	const d100 = new Dice(100);
@@ -95,43 +94,55 @@ const figth = (hero, villain) => {
 
 	while( !stopFigth ){
 
+		turnNumber++;
+		console.log("Turno: " + turnNumber)
+
 		// Turno del heroe
 		if(turn === "hero"){
 
-			Phase1(d100, hero, villain);
-
+			Phase1(d100, hero, villain, erudite);
+			
 			console.log("Cambio de turno al villano");
 			turn = "villain"
-
-			if (turnCounter >= 5){
-				turnCounter = 0;
-			}
-
 		} 
 		
 		// Turno del Villano
 		if (turn === "villain"){
 
-			Phase1(d100, villain, hero);
+			Phase1(d100, villain, hero, erudite);
 
 			console.log("Cambio de turno al heroe");
 			turn = "hero"
 
-			if (turnCounter >= 5){
-				turnCounter = 0;
-			}
-
 		} 
 		
+		if (turnCounter >= 5){
+			turnCounter = 0;
+		}
 		
 		if (turn === "erudite") {
 			// El erudito se muestra
 			console.log("******************************")
 			console.log("El erudito se muestra asombrado por los dos guerreros, pero se mofa de ellos")
+			
+			// Funcion que añade estadisticas de anger al Erudito
+			angerSelection(erudite)
+
+			// Si el erudito a perdido las gafas las tendra el atacante
+			if(!erudite.glassesOn){
+				
+				// Asignanamiento aleatorio del atacante que recoje las gafas
+				const randomNumber = Math.random();
+				randomNumber < 0.5 ? hero.glassesOn = true : villain.glassesOn = true;
+				turn = randomNumber < 0.5 ? "hero" : "villain";
+
+				console.log("El " + turn + " Ha recogido las gafas del erudito!")
+			}
+
 			console.log("******************************")
 
+			// Reinicia la aparicion de turno del Erudito
 			turnCounter = 0;
-			turn = "hero"
 		}
 
 
@@ -183,14 +194,14 @@ const showStats = (fighter) => {
 	console.log("-----------------------")
 }
 
-const Phase1 = (d100, fighter, target) => {
+const Phase1 = (d100, fighter, target, erudite) => {
 	const d20 	= new Dice(20);
 	const resultadoD20 	= d20.rollD20();
 	const resultadoD100 = d100.rollD100();
 
 	if (resultadoD100 <= fighter.combat){
 		console.log("")
-		Pahse2(resultadoD20, fighter, target)
+		Phase2(resultadoD20, fighter, target, erudite)
 
 		// Muestra las estadisticas
 		showStats(fighter)
@@ -199,9 +210,14 @@ const Phase1 = (d100, fighter, target) => {
 	} else{ console.log(fighter.name + " Ha fallado!") }
 }
 
-const Pahse2 = (resultadoD20, fighter, target) => {
+const Phase2 = (resultadoD20, fighter, target, erudite) => {
 	console.log("El ataque de " + fighter.name + " Es exitoso");
-	DiceD20Phase(resultadoD20, fighter, target);
+
+	if (!fighter.glassesOn){
+		DiceD20Phase(resultadoD20, fighter, target);
+	} else if (fighter.glassesOn){
+		DiceD20PhaseWG(resultadoD20, fighter, target, erudite);
+	}
 }
 
 const DiceD20Phase = (resultadoD20, fighter, target) => {
@@ -253,6 +269,34 @@ const DiceD20Phase = (resultadoD20, fighter, target) => {
 
 	console.log("-----------------------")
 };
+
+const DiceD20PhaseWG = (resultadoD20, fighter, target, erudite) => {
+	
+	let damage = 0;
+
+	// Pifia
+	if (resultadoD20 >= 1 && resultadoD20 <= 3) {
+		damage = Math.ceil(resultadoD20);
+		fighter.hitPoints -= damage;
+		fighter.strength = fighter.strength/2 
+
+		console.log("PIFIA! El atacante envuelto en rabia por las gafas del erudito lanza un ataque tan endeble que falla y se hiere a si mismo");
+
+		}
+		console.log("El ataque de " + fighter.name + " es desastroso y se ejerce un daño de: " + damage + " puntos")
+}
+
+const angerSelection = (erudite) => {
+
+	// Creamos un D20
+	const d20 	= new Dice(20);
+	const resultadoD20 	= d20.rollD20();
+
+	console.log("El erudito tira un D20 y saca: " + resultadoD20 + " aumentando su enfado")
+
+	// Otorgamos Resultado del D20
+	erudite.ANG = resultadoD20
+}
 
 
 
