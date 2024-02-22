@@ -4,6 +4,7 @@ export default class Erudite {
       this.ANG = 0;
       this.HPW = 1 + this.ANG;
       this.HPG = "invencible";
+      this.glassesOn = false;
   }
 }
 

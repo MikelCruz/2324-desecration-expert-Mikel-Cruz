@@ -10,6 +10,7 @@ export default class Villain {
       this.combat = villainData[0].powerstats.combat;
       this.starts = false
       this.hitPoints = this.strength * 10;
+      this.glassesOn = false;
   }
 }
 
