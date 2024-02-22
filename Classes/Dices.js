@@ -21,10 +21,17 @@ export default class Dice {
     return this.roll();
   }
 
+  rollD10() {
+    if (this.sides !== 10) {
+      throw new Error('Este dado no tiene 10 caras.');
+    }
+    return this.roll();
+  }
+
   rollD3() {
     if (this.sides !== 3) {
       throw new Error('Este dado no tiene 3 caras.');
     }
     return this.roll();
-  }
+  }  
 }
