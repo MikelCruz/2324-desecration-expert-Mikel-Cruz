@@ -98,6 +98,7 @@ const figth = (hero, villain, erudite) => {
 		if(turn === "hero"){
 
 			Phase1(d100, hero, villain, erudite);
+			armChecker(hero);
 
 			console.log("Cambio de turno al villano");
 			turn = "villain"
@@ -110,6 +111,7 @@ const figth = (hero, villain, erudite) => {
 		if (turn === "villain"){
 
 			Phase1(d100, villain, hero, erudite);
+			armChecker(villain);
 
 			console.log("Cambio de turno al heroe");
 			turn = "hero"
@@ -302,9 +304,14 @@ const DiceD20PhaseWG = (resultadoD20, fighter, target, erudite) => {
 	if (resultadoD20 >= 1 && resultadoD20 <= 3) {
 		damage = Math.ceil(newResultD20);
 		fighter.hitPoints -= damage;
-		fighter.strength = fighter.strength/2 
-		// console.log("PIFIA! El atacante envuelto en rabia por las gafas del erudito lanza un ataque tan endeble que falla y se hiere a si mismo");
-		console.log("Pifia. El atacante se lesionará el brazo izquierdo, quedando su atributo STR dañado")
+
+		// No se puede quitar el brazo sino lo tiene por lo que no pierde la mitad de la fuerza de nuevo
+		if(fighter.hasLeftArm){
+			fighter.strength = fighter.strength/2 
+			fighter.hasLeftArm = false
+			console.log("Pifia. El atacante se lesionará el brazo izquierdo, quedando su atributo STR dañado")
+		}
+	
 		console.log("El ataque de " + fighter.name + " es desastroso y se ejerce un daño de: " + damage + " puntos")
 	}
 
@@ -312,8 +319,13 @@ const DiceD20PhaseWG = (resultadoD20, fighter, target, erudite) => {
 	if (resultadoD20 >= 4 && resultadoD20 <= 6) {
 		damage = Math.ceil(newResultD20);
 		fighter.hitPoints -= damage;
-		fighter.strength = fighter.strength/2 
-		console.log("Pifia. El atacante se lesionará el brazo derecho, quedando su atributo STR dañado")
+
+		if(fighter.hasRightArm){
+			fighter.strength = fighter.strength/2 
+			fighter.hasRightArm = false
+			console.log("Pifia. El atacante se lesionará el brazo derecho, quedando su atributo STR dañado")
+		}	
+
 		console.log("El ataque de " + fighter.name + " es desastroso y se ejerce un daño de: " + damage + " puntos")
 	}
 
@@ -370,6 +382,14 @@ const angerSelection = (erudite) => {
 
 	// Otorgamos Resultado del D20
 	erudite.ANG = resultadoD20
+}
+
+const armChecker = (fighter) => {
+
+	// Sino tienen ninguno de los dos brazos su fuerza se reducira a la cuarta parte
+	if(!fighter.hasLeftArm && !fighter.hasRightArm ){
+		fighter.strength = fighter.strength / 4
+	}
 }
 
 

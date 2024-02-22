@@ -14,5 +14,8 @@ export default class Hero {
       // Los hitPoints no pueden tener más de 666 
       this.hitPoints = this.strength * 10;
       this.hitPoints = (this.hitPoints > 666) ? 666 : this.hitPoints;
+
+      this.hasLeftArm     = true;
+      this.hasRightArm    = true;
   }
 }

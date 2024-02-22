@@ -11,6 +11,9 @@ export default class Villain {
       this.starts = false
       this.hitPoints = this.strength * 10;
       this.glassesOn = false;
+
+      this.hasLeftArm     = true;
+      this.hasRightArm    = true;
   }
 }
 
